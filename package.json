@@ -1,0 +1,15 @@
+{
+    "name": "cron-spotify",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "node clock.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "request": "^2.88.2"
+    }
+}
