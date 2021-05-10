@@ -18,10 +18,13 @@ const livePlaylistLimit = 10
 function addTrackFromRadio() {
     function getTrackFromRadio(completion) {
         // get song from radio
-        request.get(url, (error, response, body) => {
-            const parsedBody = JSON.parse(body),
-                artist = parsedBody.data.artist,
-                song = parsedBody.data.title
+        const options = {
+            url: url,
+            json: true
+        }
+        request.get(options, (error, response, body) => {
+            const artist = body.data.artist,
+                song = body.data.title
 
             const searchRequest = artist + " " + song
 
@@ -125,13 +128,12 @@ function addTrackFromRadio() {
         }
 
         request.get(options, (error, message, body) => {
-            let parsedBody = JSON.parse(body),
-                total = parsedBody.total
+            const total = body.total
 
             if (total != null) {
                 let trackToRemove
                 if (total >= livePlaylistLimit) {
-                    trackToRemove = parsedBody.items[0]
+                    trackToRemove = body.items[0]
                 }
                 completion(true, total, trackToRemove)
             } else {
@@ -252,7 +254,6 @@ function addTrackFromRadio() {
         }).then((count) => {
             addTrackToLivePlaylist(track, count)
         })
-
     }).catch((info) => {
         console.error(info)
     })
