@@ -3,6 +3,7 @@
 
 # Whitelist
 !.gitignore
+!*.md
 
 # Folders
 node_modules
