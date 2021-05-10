@@ -41,7 +41,6 @@ function addTrackFromRadio() {
             return
         }
         // update auth_token
-        // should make update not every time
         const options = {
             url: 'https://accounts.spotify.com/api/token',
             headers: { 'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64')) },
@@ -59,7 +58,7 @@ function addTrackFromRadio() {
 
                 completion(true)
             } else {
-                console.error(body, refresh_token)
+                console.error(body)
                 completion(false)
             }
         })
@@ -74,17 +73,12 @@ function addTrackFromRadio() {
         }
 
         request.get(options, function (error, response, body) {
-            if (response.statusCode === 401) {
-                console.log(response.statusMessage + ' Invalid access token')
-                // unauthorized()
+            if (body && body.tracks && body.tracks.items && body.tracks.items[0] && body.tracks.items[0].uri) {
+                let foundTrack = body.tracks.items[0]
+                console.log('Found track uri: ' + body.tracks.items[0].uri)
+                completion(true, foundTrack)
             } else {
-                if (body && body.tracks && body.tracks.items && body.tracks.items[0] && body.tracks.items[0].uri) {
-                    let foundTrack = body.tracks.items[0]
-                    console.log('Found track uri: ' + body.tracks.items[0].uri)
-                    completion(true, foundTrack)
-                } else {
-                    completion(false, null)
-                }
+                completion(false)
             }
         })
     }
@@ -137,7 +131,7 @@ function addTrackFromRadio() {
                 }
                 completion(true, total, trackToRemove)
             } else {
-                completion(false, null)
+                completion(false)
             }
         })
     }
