@@ -1,0 +1,9 @@
+
+#Everything will be ignored.
+*
+
+# Whitelist
+!.gitignore
+
+# Folders
+node_modules
