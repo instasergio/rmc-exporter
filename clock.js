@@ -19,11 +19,11 @@ function addTrackFromRadio() {
     function getTrackFromRadio(completion) {
         // get song from radio
         request.get(url, (error, response, body) => {
-            let parsedBody = JSON.parse(body),
+            const parsedBody = JSON.parse(body),
                 artist = parsedBody.data.artist,
                 song = parsedBody.data.title
 
-            searchRequest = artist + " " + song
+            const searchRequest = artist + " " + song
 
             console.log('On radio now: ' + searchRequest)
 
@@ -39,7 +39,7 @@ function addTrackFromRadio() {
         }
         // update auth_token
         // should make update not every time
-        let options = {
+        const options = {
             url: 'https://accounts.spotify.com/api/token',
             headers: { 'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64')) },
             form: {
@@ -64,10 +64,9 @@ function addTrackFromRadio() {
 
     function searchTrackOnSpotify(track, completion) {
         // request spotify search track
-        let options = {
-            url: 'https://api.spotify.com/v1/search?q=' + encodeURI(searchRequest) + '&type=track&limit=1',
+        const options = {
+            url: 'https://api.spotify.com/v1/search?q=' + encodeURIComponent(track) + '&type=track&limit=1',
             headers: { 'Authorization': 'Bearer ' + access_token },
-            form: {},
             json: true
         }
 
@@ -88,9 +87,10 @@ function addTrackFromRadio() {
     }
 
     function addTrackToMainPlaylist(track) {
-        let options = {
+        const options = {
             url: 'https://api.spotify.com/v1/playlists/' + playlistIdMain + '/tracks?position=0&uris=' + track.uri,
-            headers: { 'Authorization': 'Bearer ' + access_token }
+            headers: { 'Authorization': 'Bearer ' + access_token },
+            json: true
         }
         request.post(options, function (error, response, body) {
             if (!error && response.statusCode === 201) {
@@ -102,9 +102,10 @@ function addTrackFromRadio() {
     }
 
     function addTrackToLivePlaylist(track, position) {
-        let options = {
+        const options = {
             url: 'https://api.spotify.com/v1/playlists/' + playlistIdLive + '/tracks?position=' + position + '&uris=' + track.uri,
-            headers: { 'Authorization': 'Bearer ' + access_token }
+            headers: { 'Authorization': 'Bearer ' + access_token },
+            json: true
         }
 
         request.post(options, function (error, response, body) {
@@ -117,9 +118,10 @@ function addTrackFromRadio() {
     }
 
     function livePlaylistTracksCount(completion) {
-        let options = {
+        const options = {
             url: 'https://api.spotify.com/v1/playlists/' + playlistIdLive + '/tracks?market=GB',
-            headers: { 'Authorization': 'Bearer ' + access_token }
+            headers: { 'Authorization': 'Bearer ' + access_token },
+            json: true
         }
 
         request.get(options, (error, message, body) => {
@@ -164,10 +166,9 @@ function addTrackFromRadio() {
 
     function firstTrackOfMainPlaylistMatches(track, completion) {
         // request first track of playlist
-        let options = {
+        const options = {
             url: 'https://api.spotify.com/v1/playlists/' + playlistIdMain + '/tracks',
             headers: { 'Authorization': 'Bearer ' + access_token },
-            form: {},
             json: true
         }
         request.get(options, (error, response, body) => {
