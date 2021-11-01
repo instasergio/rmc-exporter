@@ -74,18 +74,22 @@ function addTrackFromRadio() {
 
         request.get(options, function (error, response, body) {
             if (body && body.tracks && body.tracks.items && body.tracks.items[0] && body.tracks.items[0].uri) {
-                let foundTrack = body.tracks.items[0]
-                console.log('Found track uri: ' + body.tracks.items[0].uri)
-                completion(true, foundTrack)
+                let foundTrackUri = body.tracks.items[0].uri
+                // fixing fucking spotify search API
+                if (foundTrackUri === 'spotify:track:39eY7VbkqwAuIBxkOyF8Ur') {
+                    foundTrackUri = 'spotify:track:4jtdJTahwSiNg3iyrUnGvp'
+                }
+                console.log('Found track uri: ' + foundTrackUri)
+                completion(true, foundTrackUri)
             } else {
                 completion(false)
             }
         })
     }
 
-    function addTrackToMainPlaylist(track) {
+    function addTrackToMainPlaylist(trackUri) {
         const options = {
-            url: 'https://api.spotify.com/v1/playlists/' + playlistIdMain + '/tracks?position=0&uris=' + track.uri,
+            url: 'https://api.spotify.com/v1/playlists/' + playlistIdMain + '/tracks?position=0&uris=' + trackUri,
             headers: { 'Authorization': 'Bearer ' + access_token },
             json: true
         }
@@ -98,9 +102,9 @@ function addTrackFromRadio() {
         })
     }
 
-    function addTrackToLivePlaylist(track, position) {
+    function addTrackToLivePlaylist(trackUri, position) {
         const options = {
-            url: 'https://api.spotify.com/v1/playlists/' + playlistIdLive + '/tracks?position=' + position + '&uris=' + track.uri,
+            url: 'https://api.spotify.com/v1/playlists/' + playlistIdLive + '/tracks?position=' + position + '&uris=' + trackUri,
             headers: { 'Authorization': 'Bearer ' + access_token },
             json: true
         }
@@ -160,7 +164,7 @@ function addTrackFromRadio() {
         })
     }
 
-    function firstTrackOfMainPlaylistMatches(track, completion) {
+    function firstTrackOfMainPlaylistMatches(trackUri, completion) {
         // request first track of playlist
         const options = {
             url: 'https://api.spotify.com/v1/playlists/' + playlistIdMain + '/tracks',
@@ -171,11 +175,11 @@ function addTrackFromRadio() {
             let firstTrackInPlaylist = body.items[0].track
             console.log('First track in playlist uri: ' + body.items[0].track.uri)
 
-            if (firstTrackInPlaylist.uri === track.uri) {
-                completion(false, track)
+            if (firstTrackInPlaylist.uri === trackUri) {
+                completion(false, trackUri)
             } else {
                 console.log('Track is new')
-                completion(true, track)
+                completion(true, trackUri)
             }
         })
     }
@@ -196,26 +200,26 @@ function addTrackFromRadio() {
         })
     }).then((trackName) => {
         return new Promise((resolve, reject) => {
-            searchTrackOnSpotify(trackName, (success, foundTrack) => {
+            searchTrackOnSpotify(trackName, (success, foundTrackUri) => {
                 if (success) {
-                    resolve(foundTrack)
+                    resolve(foundTrackUri)
                 } else {
                     reject('Track not found on spotify.')
                 }
             })
         })
-    }).then((track) => {
+    }).then((foundTrackUri) => {
         return new Promise((resolve, reject) => {
-            firstTrackOfMainPlaylistMatches(track, (success, track) => {
+            firstTrackOfMainPlaylistMatches(foundTrackUri, (success, trackUri) => {
                 if (success) {
-                    resolve(track)
+                    resolve(trackUri)
                 } else {
                     reject('Track already in playlist.')
                 }
             })
         })
-    }).then((track) => {
-        addTrackToMainPlaylist(track)
+    }).then((trackUri) => {
+        addTrackToMainPlaylist(trackUri)
 
         return new Promise((resolve, reject) => {
             livePlaylistTracksCount((success, count, trackToRemove) => {
@@ -246,7 +250,7 @@ function addTrackFromRadio() {
                 return count
             }
         }).then((count) => {
-            addTrackToLivePlaylist(track, count)
+            addTrackToLivePlaylist(trackUri, count)
         })
     }).catch((info) => {
         console.error(info)
