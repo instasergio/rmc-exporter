@@ -10,8 +10,10 @@ let token_refresh_time
 const playlistIdMain = '32jmNqf6iLAf3oqhmNNspd'
 const playlistIdLive = '6ohV6Zqtj1yFrgvygwfFf3'
 
-const stationName = 'monte-carlo-spb'
-const url = 'https://recordrussia.ru/api/station/' + stationName + '/current'
+// const stationName = 'monte-carlo-spb'
+// const url = 'https://recordrussia.ru/api/station/' + stationName + '/current'
+
+const url = 'http://94.140.192.162:23347/site/broad.txt'
 
 const livePlaylistLimit = 10
 
@@ -23,11 +25,10 @@ function addTrackFromRadio() {
             json: true
         }
         request.get(options, (error, response, body) => {
-            const artist = body.data.artist,
-                song = body.data.title
-
-            const searchRequest = artist + " " + song
-
+            if (error) {
+                console.log(error)
+            }
+            const searchRequest = body
             console.log('On radio now: ' + searchRequest)
 
             completion(searchRequest)
