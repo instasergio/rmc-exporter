@@ -27,8 +27,16 @@ function addTrackFromRadio() {
         request.get(options, (error, response, body) => {
             if (error) {
                 console.log(error)
+                throw new Error(error);
             }
+            
             const searchRequest = body
+
+            if (searchRequest === 'undefined') {
+                const error = 'Undefined from server';
+                console.log(error)
+                throw new Error(error);
+            }
             console.log('On radio now: ' + searchRequest)
 
             completion(searchRequest)
